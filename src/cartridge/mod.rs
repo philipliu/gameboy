@@ -1,3 +1,8 @@
+use self::header::{Metadata, get_metadata};
+
+mod header;
+
+/// Max ROM size
 const MAX_BYTES: usize = 1_572_864;
 
 /// Cartridge errors
@@ -19,23 +24,13 @@ pub fn read(filename: &str) -> Result<Vec<u8>, CartridgeError> {
     Ok(contents)
 }
 
-#[derive(Debug)]
-pub struct Metadata {
-    raw_size: usize,
-}
-
 /// A GameBoy cartridge
 pub struct Cartridge {
     contents: Vec<u8>,
+    pub metadata: Metadata,
 }
 
-impl Cartridge {
-    pub fn metadata(&self) -> Metadata {
-        Metadata {
-            raw_size: self.contents.len()
-        }
-    }
-}
+impl Cartridge {}
 
 impl TryFrom<Vec<u8>> for Cartridge {
     type Error = CartridgeError;
@@ -44,7 +39,11 @@ impl TryFrom<Vec<u8>> for Cartridge {
         if bytes.len() > MAX_BYTES {
             Err(CartridgeError::UnexpectedRomSize)
         } else {
-            Ok(Cartridge { contents: bytes })
+            let metadata = get_metadata(&bytes);
+            Ok(Cartridge {
+                contents: bytes,
+                metadata,
+            })
         }
     }
 }
