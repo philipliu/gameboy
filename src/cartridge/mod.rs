@@ -1,4 +1,4 @@
-use self::header::{Metadata, get_metadata};
+use self::header::{Header, get_header};
 
 mod header;
 
@@ -27,7 +27,7 @@ pub fn read(filename: &str) -> Result<Vec<u8>, CartridgeError> {
 /// A GameBoy cartridge
 pub struct Cartridge {
     contents: Vec<u8>,
-    pub metadata: Metadata,
+    pub header: Header,
 }
 
 impl Cartridge {}
@@ -39,10 +39,10 @@ impl TryFrom<Vec<u8>> for Cartridge {
         if bytes.len() > MAX_BYTES {
             Err(CartridgeError::UnexpectedRomSize)
         } else {
-            let metadata = get_metadata(&bytes);
+            let header = get_header(&bytes);
             Ok(Cartridge {
                 contents: bytes,
-                metadata,
+                header,
             })
         }
     }

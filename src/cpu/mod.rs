@@ -11,6 +11,7 @@ pub struct Cpu {
     pub hl: u16,
     pub sp: u16,
     pub pc: u16,
+    pub flags: u8
 }
 
 impl Cpu {

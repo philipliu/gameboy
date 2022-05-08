@@ -32,7 +32,7 @@ fn main() -> Result<(), GbError> {
     let contents = cartridge::read(&filename)?;
     let cartridge: Cartridge = contents.try_into()?;
 
-    println!("metadata: {:#?}", cartridge.metadata);
+    println!("metadata: {:#?}", cartridge.header);
 
     Ok(())
 }
