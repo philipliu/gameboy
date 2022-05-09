@@ -1,22 +1,34 @@
+use self::opcode::Opcode;
+
 mod opcode;
 
 const H_BIT_MASK: u16 = 0xFF00;
 const L_BIT_MASK: u16 = 0x00FF;
 
 #[derive(Default)]
-pub struct Cpu {
+pub struct Registers {
     pub af: u16,
     pub bc: u16,
     pub de: u16,
     pub hl: u16,
     pub sp: u16,
     pub pc: u16,
-    pub flags: u8
 }
 
-impl Cpu {
+impl Registers {
     pub fn new() -> Self {
-        Cpu::default()
+        Registers::default()
+    }
+
+    pub fn dmg() -> Self {
+        Registers {
+            af: 0x01B0,
+            bc: 0x0013,
+            de: 0x00D8,
+            hl: 0x014D,
+            sp: 0xFFFE,
+            pc: 0x0100,
+        }
     }
 
     pub fn a(&self) -> u8 {
@@ -52,63 +64,78 @@ impl Cpu {
     }
 }
 
+#[derive(Default)]
+pub struct Cpu {
+    pub registers: Registers,
+}
+
+impl Cpu {
+    pub fn new() -> Self {
+        Cpu::default()
+    }
+
+    pub fn execute(&mut self, opcode: Opcode) {
+        todo!()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_a() {
-        let mut cpu = Cpu::new();
-        cpu.af = 0xDEAD;
-        assert_eq!(cpu.a(), 0xDE);
+        let mut reg = Registers::new();
+        reg.af = 0xDEAD;
+        assert_eq!(reg.a(), 0xDE);
     }
 
     #[test]
     fn test_f() {
-        let mut cpu = Cpu::new();
-        cpu.af = 0xDEAD;
-        assert_eq!(cpu.f(), 0xAD);
+        let mut reg = Registers::new();
+        reg.af = 0xDEAD;
+        assert_eq!(reg.f(), 0xAD);
     }
 
     #[test]
     fn test_b() {
-        let mut cpu = Cpu::new();
-        cpu.bc = 0xDEAD;
-        assert_eq!(cpu.b(), 0xDE);
+        let mut reg = Registers::new();
+        reg.bc = 0xDEAD;
+        assert_eq!(reg.b(), 0xDE);
     }
 
     #[test]
     fn test_c() {
-        let mut cpu = Cpu::new();
-        cpu.bc = 0xDEAD;
-        assert_eq!(cpu.c(), 0xAD);
+        let mut reg = Registers::new();
+        reg.bc = 0xDEAD;
+        assert_eq!(reg.c(), 0xAD);
     }
 
     #[test]
     fn test_d() {
-        let mut cpu = Cpu::new();
-        cpu.de = 0xDEAD;
-        assert_eq!(cpu.d(), 0xDE);
+        let mut reg = Registers::new();
+        reg.de = 0xDEAD;
+        assert_eq!(reg.d(), 0xDE);
     }
 
     #[test]
     fn test_e() {
-        let mut cpu = Cpu::new();
-        cpu.de = 0xDEAD;
-        assert_eq!(cpu.e(), 0xAD);
+        let mut reg = Registers::new();
+        reg.de = 0xDEAD;
+        assert_eq!(reg.e(), 0xAD);
     }
 
     #[test]
     fn test_h() {
-        let mut cpu = Cpu::new();
-        cpu.hl = 0xDEAD;
-        assert_eq!(cpu.h(), 0xDE);
+        let mut reg = Registers::new();
+        reg.hl = 0xDEAD;
+        assert_eq!(reg.h(), 0xDE);
     }
 
     #[test]
     fn test_l() {
-        let mut cpu = Cpu::new();
-        cpu.hl = 0xDEAD;
-        assert_eq!(cpu.l(), 0xAD);
+        let mut reg = Registers::new();
+        reg.hl = 0xDEAD;
+        assert_eq!(reg.l(), 0xAD);
     }
 }

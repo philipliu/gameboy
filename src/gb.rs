@@ -1,14 +1,16 @@
-use crate::cpu::Cpu;
+use crate::{cpu::Cpu, memory::Memory};
 
 
 struct Gb {
-    cpu: Cpu
+    cpu: Cpu,
+    memory: Memory
 }
 
 impl Gb {
     pub fn new() -> Self {
         Self {
-            cpu: Cpu::new()
+            cpu: Cpu::new(),
+            memory: Memory::new()
         }
     }
 

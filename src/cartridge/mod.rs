@@ -8,13 +8,13 @@ const MAX_BYTES: usize = 1_572_864;
 /// Cartridge errors
 #[derive(Debug)]
 pub enum CartridgeError {
-    IoError(std::io::Error),
-    UnexpectedRomSize,
+    Io(std::io::Error),
+    Corrupted,
 }
 
 impl From<std::io::Error> for CartridgeError {
     fn from(error: std::io::Error) -> Self {
-        CartridgeError::IoError(error)
+        CartridgeError::Io(error)
     }
 }
 
@@ -37,7 +37,7 @@ impl TryFrom<Vec<u8>> for Cartridge {
 
     fn try_from(bytes: Vec<u8>) -> Result<Self, CartridgeError> {
         if bytes.len() > MAX_BYTES {
-            Err(CartridgeError::UnexpectedRomSize)
+            Err(CartridgeError::Corrupted)
         } else {
             let header = get_header(&bytes);
             Ok(Cartridge {

@@ -6,6 +6,7 @@ use crate::cartridge::Cartridge;
 mod cartridge;
 mod cpu;
 mod gb;
+mod memory;
 
 #[derive(Debug)]
 enum GbError {
