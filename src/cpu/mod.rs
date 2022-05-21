@@ -1,6 +1,4 @@
-use self::opcode::Opcode;
-
-mod opcode;
+mod instruction;
 
 const H_BIT_MASK: u16 = 0xFF00;
 const L_BIT_MASK: u16 = 0x00FF;
@@ -72,10 +70,6 @@ pub struct Cpu {
 impl Cpu {
     pub fn new() -> Self {
         Cpu::default()
-    }
-
-    pub fn execute(&mut self, opcode: Opcode) {
-        todo!()
     }
 }
 

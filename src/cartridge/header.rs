@@ -1,5 +1,5 @@
 /// Cartridge type determines which Memory Bank Controller is used
-#[warn(non_camel_case_types)]
+#[allow(non_camel_case_types)]
 #[derive(Debug)]
 pub enum CartridgeType {
     ROM_ONLY,
