@@ -26,10 +26,17 @@ impl Memory {
         let start = addr as usize;
         let end = addr as usize + 1;
 
-        ((self.data[start] as u16) << 8 | self.data[end] as u16)
+        (self.data[start] as u16) << 8 | self.data[end] as u16
     }
 
     pub fn set_byte(&mut self, addr: u16, byte: u8) {
         self.data[addr as usize] = byte;
+    }
+
+    pub fn set_word(&mut self, addr: u16, word: u16) {
+        let start = addr as usize;
+        let end = start + 1;
+        self.data[start] = ((word & 0xFF00) >> 8) as u8;
+        self.data[end] = (word & 0x00FF) as u8;
     }
 }
