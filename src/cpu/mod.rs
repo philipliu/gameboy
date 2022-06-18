@@ -24,6 +24,20 @@ impl Default for Registers {
     }
 }
 
+/// Register flags in the lower bits of the AF register.
+enum Flag {
+    /// Set if an only if the result of the oepration is 0.
+    Zero,
+    Subtraction,
+    HalfCarry,
+    /// Set if:
+    /// - the result of an 8-bit addition is higher than $FF
+    /// - the result of a 16-bit addition is higher than $FFFF
+    /// - the result of a substraction is lower than zero
+    /// - a rotate/shift operation shifts out a "1" bit
+    Carry,
+}
+
 impl Registers {
     pub fn dmg() -> Self {
         Registers {
@@ -62,6 +76,50 @@ impl Registers {
 
     pub fn concat(upper: u8, lower: u8) -> u16 {
         (upper as u16) << 8 | (lower as u16)
+    }
+
+    pub fn set_flag(&mut self, flag: &Flag, value: bool) {
+        match flag {
+            Flag::Zero => {
+                if value {
+                    self.af |= 0b0001 as u16
+                } else {
+                    self.af &= 0b1110 as u16
+                }
+            }
+            Flag::Subtraction => {
+                if value {
+                    self.af |= 0b0010 as u16
+                } else {
+                    self.af &= 0b1101 as u16
+                }
+            }
+            Flag::HalfCarry => {
+                if value {
+                    self.af |= 0b0100 as u16
+                } else {
+                    self.af &= 0b1011 as u16
+                }
+            }
+            Flag::Carry => {
+                if value {
+                    self.af |= 0b1000 as u16
+                } else {
+                    self.af &= 0b0111 as u16
+                }
+            }
+        }
+    }
+
+    pub fn get_flag(&self, flag: &Flag) -> bool {
+        let flag = match flag {
+            Flag::Zero => self.af & 0b0001,
+            Flag::Subtraction => self.af & 0b0010,
+            Flag::HalfCarry => self.af & 0b0100,
+            Flag::Carry => self.af & 0b1000,
+        };
+
+        flag > 0
     }
 }
 
@@ -146,7 +204,14 @@ impl Cpu {
                 self.mem_write_word(addr, self.registers.sp);
             }
             // ADD HL, BC
-            0x09 => {}
+            0x09 => {
+                let bc = self.registers.bc;
+                let hl = self.registers.hl;
+                let result = hl.wrapping_add(bc);
+                // set flags
+
+                self.registers.hl = result;
+            }
             _ => unimplemented!("{:x} is unimplemented", op),
         }
     }
@@ -193,7 +258,9 @@ mod tests {
 }
 
 #[cfg(test)]
-mod registers {
+mod register_tests {
+    use rstest::rstest;
+
     use super::*;
 
     #[test]
@@ -212,5 +279,35 @@ mod registers {
         let lower = 0xCD;
 
         assert_eq!(Registers::concat(upper, lower), 0xABCD);
+    }
+
+    #[rstest]
+    #[case(Flag::Zero, 0b0001)]
+    #[case(Flag::Subtraction, 0b0010)]
+    #[case(Flag::HalfCarry, 0b0100)]
+    #[case(Flag::Carry, 0b1000)]
+    fn test_set_get_flag_zero(#[case] flag: Flag, #[case] ordinal: u16) {
+        let mut reg = get_empty_reg();
+
+        reg.set_flag(&flag, true);
+
+        assert_eq!(reg.af, ordinal);
+        assert_eq!(reg.get_flag(&flag), true);
+
+        reg.set_flag(&flag, false);
+
+        assert_eq!(reg.af, 0b0000);
+        assert_eq!(reg.get_flag(&flag), false);
+    }
+
+    fn get_empty_reg() -> Registers {
+        Registers {
+            af: 0,
+            bc: 0,
+            de: 0,
+            hl: 0,
+            sp: 0,
+            pc: 0,
+        }
     }
 }
